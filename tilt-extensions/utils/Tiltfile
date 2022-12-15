@@ -1,0 +1,30 @@
+#########################
+# Utils Tilt Extension  #
+#########################
+
+# Enforce a minimum Tilt version
+version_settings(constraint='>=0.27.0')
+
+"""
+Fail Tiltfile execution if missing a required tool
+Args:
+    tool(string): tool name
+"""
+def require_tool(tool):
+    tool = shlex.quote(tool)
+    cmd = 'command -v {tool} >/dev/null 2>&1 || echo "fail"'.format( tool=tool )
+    result=local( cmd, echo_off=True, quiet=True )
+    if (str(result).rstrip() == 'fail') :
+        fail('The {} tool was not found. Please install it first'.format(tool))
+
+"""
+Fail Tiltfile execution if missing a required helm repository
+Args:
+    repoName(string): Repository name
+"""
+def require_helm_repo(repoName):
+    repo = shlex.quote(repoName)
+    cmd = 'helm repo list | grep -q "^{repo}" || echo "fail"'.format( repo=repo )
+    result=local( cmd, echo_off=True, quiet=True )
+    if (str(result).rstrip() == 'fail') :
+        fail('Helm repo {} not found. Please add it.'.format(repo))
